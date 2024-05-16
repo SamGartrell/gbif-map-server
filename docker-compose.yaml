@@ -1,0 +1,137 @@
+version: '1'
+
+networks:
+  pgnetwork:
+    driver: bridge
+
+services:
+  postgis_db:
+    container_name: postgis_ne
+    image: postgis/postgis:16-3.4
+    restart: on-failure
+    env_file:
+      - env/postgis.env
+    ports:
+      - "5433:5432"
+    # expose:
+    #   - "5433"
+    command: -p 5433
+    volumes:
+      - ./db/pgdata:/var/lib/postgresql/data
+      # - ./db/initdb.d:/docker-entrypoint-initdb.d
+      # - ./db/sql/naturalearth_db_setup.sql:/docker-entrypoint-initdb.d/naturalearth_db_setup.sql
+      # - ./db/backups:/opt/backups
+    networks:
+      - pgnetwork
+    healthcheck:
+      test: ["CMD", "pg_isready", "-q", "-p", "5433", "-d", "natural_earth", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgbouncer:
+    container_name: pgbouncer_ne
+    image: bitnami/pgbouncer:latest
+    ports:
+      - "6432:6432"
+    env_file:
+      - env/pgbouncer.env
+    volumes:
+      # - ./pgbouncer/pgbouncer.init:/etc/pgbouncer/pgbouncer.ini:ro
+      - ./pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt:ro
+      # - ./pgbouncer/init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - pgnetwork
+    depends_on:
+      postgis_db:
+        condition: service_healthy
+    # healthcheck:
+    #   test: ["CMD", "wget", "-O", "-", "http://localhost:6432/misc/ping"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 3
+
+
+  pgadmin:
+    container_name: pgadmin4_ne
+    image: dpage/pgadmin4:latest
+    restart: on-failure
+    env_file:
+      - env/pgadmin.env
+    ports:
+      - "5050:80"
+    networks:
+      - pgnetwork
+    depends_on:
+      # pgbouncer:
+      #   condition: service_healthy
+      - pgbouncer
+      
+
+  pg_tileserv:
+    container_name: pg_tileserv_ne
+    image: pramsey/pg_tileserv:latest
+    restart: on-failure
+    env_file:
+      - env/pg_tileserv.env
+    ports:
+      - "7800:7800"
+    networks:
+      - pgnetwork
+    depends_on:
+      # pgbouncer:
+      #   condition: service_healthy
+      - pgbouncer
+
+  pg_featureserv:
+    container_name: pg_featureserv_ne
+    image: pramsey/pg_featureserv:latest
+    restart: on-failure
+    env_file:
+      - env/pg_featureserv.env
+    ports:
+      - "9000:9000"
+    networks:
+      - pgnetwork
+    depends_on:
+      # pgbouncer:
+      #   condition: service_healthy
+      - pgbouncer
+
+  postgrest:
+    container_name: postgrest_ne
+    image: bitnami/postgrest:latest
+    ports:
+      - 3000:3000
+    env_file:
+      - env/postgrest.env
+    volumes:
+      - ./postgrest/tutorial.conf:/tutorial.conf
+    networks:
+      - pgnetwork
+    depends_on:
+      # pgbouncer:
+      #   condition: service_healthy
+      - pgbouncer
+
+  varnish:
+    container_name: varnish_ne
+    image: eeacms/varnish
+    restart: on-failure
+    environment:
+      BACKENDS: "pg_tileserv_ne:7800"
+      DNS_ENABLED: "false"
+      COOKIES: "true"
+      PARAM_VALUE: "-p default_ttl=600"
+      VARNISH_SIZE: "200M"
+    # env_file:
+    #   - env/varnish.env
+    volumes:
+      - ./varnish/default.vcl:/etc/varnish/default.vcl:ro
+      - ./varnish/varnish_cache:/var/lib/varnish
+    networks:
+      - pgnetwork
+    ports:
+      - "8080:6081"
+    depends_on:
+      - pg_tileserv

@@ -1,0 +1,4 @@
+"postgres" "postgis"
+"tileserv" "tileserv"
+"featureserv" "featureserv"
+"authenticator" "postgrest"
