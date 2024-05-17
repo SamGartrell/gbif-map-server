@@ -1,0 +1,40 @@
+GBIF api call parameters
+
+hit the occurrence API with the following specified:
+country
+hasCoordinate=True
+hasGeospatialIssue=False
+
+maybe the following if Brooke actually thinks this would be a useful collaborative project
+	isSequenced (likely will steeply impact # of availbale observations)
+
+maybe the following except they might exclude recrds with higher levels of classification
+	familyKey 
+	genusKey (maybe an option to get this boi)
+	speciesKey (probably just this boi)
+	
+maybe the following if making a mushroom hunting map where time is of the essence
+	month
+	year (can use math to get some good info about age of observation)
+
+
+maybe the following if you wanna select within a distance of you/something
+	decimalLatitude
+	decimalLongitude
+	geoDistance
+
+	alternatively, maybe just grab them within a geometry:
+		geometry (uses a WKT polygon/multipolygon)
+
+	alternatively, maybe just grab them within a state:
+		stateProvince=Washington
+
+Programmatic Parameters
+paging the db:
+	limit
+	offset
+
+make requests on the fly or make requests before? depends on how the data can come across. E.g. if they serve JSON, can do this w pure frontend; if csv/tsv, need an etl process into postgis etc etc puke
+
+POLYGON ((-481.854272 48.918438, -481.537771 48.919792, -481.498637 48.853421, -481.544636 48.783795, -481.717648 48.789224, -481.878302 48.838509, -481.900958 48.892261, -481.854272 48.918438))
+
