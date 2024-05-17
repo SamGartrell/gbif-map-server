@@ -1,6 +1,6 @@
 
 -- Create the Natural Earth PostGIS DB
-CREATE DATABASE natural_earth
+CREATE DATABASE gbif_data
     WITH
     OWNER = postgres
     TEMPLATE = template_postgis

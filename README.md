@@ -4,4 +4,4 @@
 $ docker compose up
 ```
 
-that's literally it" 
+that's literally it

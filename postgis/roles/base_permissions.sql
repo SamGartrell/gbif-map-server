@@ -2,7 +2,7 @@
 CREATE ROLE ne_base NOINHERIT;
 
 -- Grant CONNECT ON to the base role
-GRANT CONNECT ON DATABASE natural_earth TO ne_base;
+GRANT CONNECT ON DATABASE gbif_data TO ne_base;
 
 -- Grant USAGE and SELECT privileges to the "naturalearth" role on the "physical" schema
 GRANT USAGE ON SCHEMA physical TO ne_base;

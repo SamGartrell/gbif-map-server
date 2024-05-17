@@ -1,6 +1,6 @@
 [databases]
 ; Define your PostgreSQL database connection
-natural_earth = host=postgis_db port=5433 dbname=natural_earth
+gbif_data = host=postgis_db port=5433 dbname=gbif_data
 
 [pgbouncer]
 listen_addr = 0.0.0.0
