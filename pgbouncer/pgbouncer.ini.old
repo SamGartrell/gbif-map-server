@@ -1,11 +1,11 @@
 [databases]
-; * = host=postgis_ne port=5433 dbname=gbif_data
+; * = host=postgis_gbif port=5433 dbname=gbif
 ; postgres = host=127.0.0.1 port=5433 dbname=postgres
 ; mydb = host=127.0.0.1 port=5433 dbname=mydb
-* = host=postgis_ne port=5433 auth_user=postgres password=postgis dbname=gbif_data
+* = host=postgis_gbif port=5433 auth_user=postgres password=postgis dbname=gbif
 
 ; postgres = host=0.0.0.0 port=5433
-; gbif_data = host=postgis_ne port=5433 auth_user=postgres password=postgis dbname=gbif_data
+; gbif = host=postgis_gbif port=5433 auth_user=postgres password=postgis dbname=gbif
 
 [pgbouncer]
 listen_addr = *

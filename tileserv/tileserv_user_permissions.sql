@@ -1,9 +1,7 @@
--- TODO: Reconfigure "tileserv" and "featureserv" to inherit permissions from "readacess"
-
--- -- Create the "tileserv" user with a password that inherits the "ne_reader" role
+-- -- Create the "tileserv" user with a password that inherits the "gbif_reader" role
 CREATE ROLE tileserv WITH LOGIN PASSWORD 'tileserv';
--- Inherit permissions from "ne_reader"
-GRANT ne_reader TO tileserv;
+-- Inherit permissions from "gbif_reader"
+GRANT gbif_reader TO tileserv;
 
 -- -- Grant USAGE and SELECT privileges to the "tileserv" role on the "physical" schema
 -- GRANT USAGE ON SCHEMA physical TO tileserv;
@@ -18,5 +16,5 @@ GRANT ne_reader TO tileserv;
 -- REVOKE CREATE ON SCHEMA cultural FROM tileserv;
 
 -- Grant USAGE and EXECUTE privileges to the "tileserv" role on the "postgisftw" schema
-GRANT USAGE ON SCHEMA postgisftw TO tileserv;
-GRANT EXECUTE ON FUNCTION postgisftw.countries_name_ts(integer, integer, integer, text) TO tileserv;
+-- GRANT USAGE ON SCHEMA postgisftw TO tileserv;
+-- GRANT EXECUTE ON FUNCTION postgisftw.countries_name_ts(integer, integer, integer, text) TO tileserv;

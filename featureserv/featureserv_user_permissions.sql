@@ -1,9 +1,9 @@
--- TODO: Reconfigure "tileserv" and "featureserv" to inherit permissions from "ne_reader"
+-- TODO: Reconfigure "tileserv" and "featureserv" to inherit permissions from "gbif_reader"
 
 -- Create the "featureserv" role with a password
 CREATE ROLE featureserv WITH LOGIN PASSWORD 'featureserv';
--- Inherit permissions from "ne_reader"
-GRANT ne_reader TO featureserv;
+-- Inherit permissions from "gbif_reader"
+GRANT gbif_reader TO featureserv;
 
 -- -- Grant USAGE and SELECT privileges to the "featureserv" role on the "physical" schema
 -- GRANT USAGE ON SCHEMA physical TO featureserv;
@@ -19,5 +19,5 @@ GRANT ne_reader TO featureserv;
 
 
 -- Grant USAGE and EXECUTE privileges to the "featureserv" role on the "postgisftw" schema
-GRANT USAGE ON SCHEMA postgisftw TO featureserv;
-GRANT EXECUTE ON FUNCTION postgisftw.countries_name_fs(text) TO featureserv;
+-- GRANT USAGE ON SCHEMA postgisftw TO featureserv;
+-- GRANT EXECUTE ON FUNCTION postgisftw.countries_name_fs(text) TO featureserv;

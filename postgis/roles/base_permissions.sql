@@ -1,13 +1,21 @@
--- Create a base ROLE for the database
-CREATE ROLE ne_base NOINHERIT;
+-- Create a reader ROLE for the datareader
+CREATE ROLE gbif_reader NOINHERIT; -- it cannot inherit from any other account
 
--- Grant CONNECT ON to the base role
-GRANT CONNECT ON DATABASE gbif_data TO ne_base;
+-- Grant CONNECT ON to the reader role
+GRANT CONNECT ON DATABASE gbif TO gbif_reader;
 
--- Grant USAGE and SELECT privileges to the "naturalearth" role on the "physical" schema
-GRANT USAGE ON SCHEMA physical TO ne_base;
-GRANT SELECT ON ALL TABLES IN SCHEMA physical TO ne_base;
+-- Grant USAGE and SELECT privileges to the "gbif_reader" role on the "fungus" schema
+GRANT USAGE ON SCHEMA fungus TO gbif_reader;
+GRANT SELECT ON ALL TABLES IN SCHEMA fungus TO gbif_reader;
 
--- Grant USAGE and SELECT privileges to the "readaccess" role on the "cultural" schema
-GRANT USAGE ON SCHEMA cultural TO ne_base;
-GRANT SELECT ON ALL TABLES IN SCHEMA cultural TO ne_base;
+-- Grant USAGE and SELECT privileges to the "gbif_reader" role on the "invasive" schema
+GRANT USAGE ON SCHEMA invasive TO gbif_reader;
+GRANT SELECT ON ALL TABLES IN SCHEMA invasive TO gbif_reader;
+
+-- Grant USAGE and SELECT privileges to the "gbif_reader" role on the "endangered" schema
+GRANT USAGE ON SCHEMA endangered TO gbif_reader;
+GRANT SELECT ON ALL TABLES IN SCHEMA endangered TO gbif_reader;
+
+-- Grant USAGE and SELECT privileges to the "gbif_reader" role on the "edible" schema
+GRANT USAGE ON SCHEMA edible TO gbif_reader;
+GRANT SELECT ON ALL TABLES IN SCHEMA edible TO gbif_reader;

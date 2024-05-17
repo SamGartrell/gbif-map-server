@@ -6,7 +6,7 @@ networks:
 
 services:
   postgis_db:
-    container_name: postgis_ne
+    container_name: postgis_gbif
     image: postgis/postgis:16-3.4
     restart: on-failure
     env_file:
@@ -24,36 +24,36 @@ services:
     networks:
       - pgnetwork
     healthcheck:
-      test: ["CMD", "pg_isready", "-q", "-p", "5433", "-d", "gbif_data", "-U", "postgres"]
+      test: ["CMD", "pg_isready", "-q", "-p", "5433", "-d", "gbif", "-U", "postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  pgbouncer:
-    container_name: pgbouncer_ne
-    image: bitnami/pgbouncer:latest
-    ports:
-      - "6432:6432"
-    env_file:
-      - env/pgbouncer.env
-    volumes:
-      # - ./pgbouncer/pgbouncer.init:/etc/pgbouncer/pgbouncer.ini:ro
-      - ./pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt:ro
-      # - ./pgbouncer/init-scripts:/docker-entrypoint-initdb.d
-    networks:
-      - pgnetwork
-    depends_on:
-      postgis_db:
-        condition: service_healthy
-    # healthcheck:
-    #   test: ["CMD", "wget", "-O", "-", "http://localhost:6432/misc/ping"]
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 3
+  # pgbouncer:
+  #   container_name: pgbouncer_gbif
+  #   image: bitnami/pgbouncer:latest
+  #   ports:
+  #     - "6432:6432"
+  #   env_file:
+  #     - env/pgbouncer.env
+  #   volumes:
+  #     # - ./pgbouncer/pgbouncer.init:/etc/pgbouncer/pgbouncer.ini:ro
+  #     - ./pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt:ro
+  #     # - ./pgbouncer/init-scripts:/docker-entrypoint-initdb.d
+  #   networks:
+  #     - pgnetwork
+  #   depends_on:
+  #     postgis_db:
+  #       condition: service_healthy
+  #   # healthcheck:
+  #   #   test: ["CMD", "wget", "-O", "-", "http://localhost:6432/misc/ping"]
+  #   #   interval: 10s
+  #   #   timeout: 5s
+  #   #   retries: 3
 
 
   pgadmin:
-    container_name: pgadmin4_ne
+    container_name: pgadmin4_gbif
     image: dpage/pgadmin4:latest
     restart: on-failure
     env_file:
@@ -63,13 +63,12 @@ services:
     networks:
       - pgnetwork
     depends_on:
-      # pgbouncer:
-      #   condition: service_healthy
-      - pgbouncer
+      postgis_db:
+        condition: service_healthy
       
 
   pg_tileserv:
-    container_name: pg_tileserv_ne
+    container_name: pg_tileserv_gbif
     image: pramsey/pg_tileserv:latest
     restart: on-failure
     env_file:
@@ -79,12 +78,11 @@ services:
     networks:
       - pgnetwork
     depends_on:
-      # pgbouncer:
-      #   condition: service_healthy
-      - pgbouncer
+      postgis_db:
+        condition: service_healthy
 
   pg_featureserv:
-    container_name: pg_featureserv_ne
+    container_name: pg_featureserv_gbif
     image: pramsey/pg_featureserv:latest
     restart: on-failure
     env_file:
@@ -94,44 +92,42 @@ services:
     networks:
       - pgnetwork
     depends_on:
-      # pgbouncer:
-      #   condition: service_healthy
-      - pgbouncer
+      postgis_db:
+        condition: service_healthy
 
-  postgrest:
-    container_name: postgrest_ne
-    image: bitnami/postgrest:latest
-    ports:
-      - 3000:3000
-    env_file:
-      - env/postgrest.env
-    volumes:
-      - ./postgrest/tutorial.conf:/tutorial.conf
-    networks:
-      - pgnetwork
-    depends_on:
-      # pgbouncer:
-      #   condition: service_healthy
-      - pgbouncer
+  # postgrest:
+  #   container_name: postgrest_gbif
+  #   image: bitnami/postgrest:latest
+  #   ports:
+  #     - 3000:3000
+  #   env_file:
+  #     - env/postgrest.env
+  #   volumes:
+  #     - ./postgrest/tutorial.conf:/tutorial.conf
+  #   networks:
+  #     - pgnetwork
+  #   depends_on:
+  #     postgis_db:
+  #       condition: service_healthy
 
-  varnish:
-    container_name: varnish_ne
-    image: eeacms/varnish
-    restart: on-failure
-    environment:
-      BACKENDS: "pg_tileserv_ne:7800"
-      DNS_ENABLED: "false"
-      COOKIES: "true"
-      PARAM_VALUE: "-p default_ttl=600"
-      VARNISH_SIZE: "200M"
-    # env_file:
-    #   - env/varnish.env
-    volumes:
-      - ./varnish/default.vcl:/etc/varnish/default.vcl:ro
-      - ./varnish/varnish_cache:/var/lib/varnish
-    networks:
-      - pgnetwork
-    ports:
-      - "8080:6081"
-    depends_on:
-      - pg_tileserv
+  # varnish:
+  #   container_name: varnish_gbif
+  #   image: eeacms/varnish
+  #   restart: on-failure
+  #   environment:
+  #     BACKENDS: "pg_tileserv_gbif:7800"
+  #     DNS_ENABLED: "false"
+  #     COOKIES: "true"
+  #     PARAM_VALUE: "-p default_ttl=600"
+  #     VARNISH_SIZE: "200M"
+  #   # env_file:
+  #   #   - env/varnish.env
+  #   volumes:
+  #     - ./varnish/default.vcl:/etc/varnish/default.vcl:ro
+  #     - ./varnish/varnish_cache:/var/lib/varnish
+  #   networks:
+  #     - pgnetwork
+  #   ports:
+  #     - "8080:6081"
+  #   depends_on:
+  #     - pg_tileserv
